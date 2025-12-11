@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
+import MobileControls from './MobileControls';
 
 // Game Constants
 const GRID_SIZE = 20;
@@ -197,31 +198,45 @@ const SnakeGame = () => {
     }, [direction, food, gameOver, isAI, highScore, decideNextMove, generateFood]);
 
     // Input Handling
+    const handleDirectionChange = useCallback((newDir) => {
+        setDirection(prevDir => {
+            // Prevent 180 degree turns
+            if (newDir.x !== 0 && prevDir.x !== 0) return prevDir;
+            if (newDir.y !== 0 && prevDir.y !== 0) return prevDir;
+            return newDir;
+        });
+    }, []);
+
+    const handleManualControl = (key) => {
+        if (isAI) return;
+
+        switch (key) {
+            case 'ArrowUp':
+            case 'UP':
+                handleDirectionChange(UP);
+                break;
+            case 'ArrowDown':
+            case 'DOWN':
+                handleDirectionChange(DOWN);
+                break;
+            case 'ArrowLeft':
+            case 'LEFT':
+                handleDirectionChange(LEFT);
+                break;
+            case 'ArrowRight':
+            case 'RIGHT':
+                handleDirectionChange(RIGHT);
+                break;
+            default:
+                break;
+        }
+    };
+
     useEffect(() => {
-        if (isAI) return; // Disable keys in AI mode
-
-        const handleKeyDown = (e) => {
-            switch (e.key) {
-                case 'ArrowUp':
-                    if (direction.y === 0) setDirection(UP);
-                    break;
-                case 'ArrowDown':
-                    if (direction.y === 0) setDirection(DOWN);
-                    break;
-                case 'ArrowLeft':
-                    if (direction.x === 0) setDirection(LEFT);
-                    break;
-                case 'ArrowRight':
-                    if (direction.x === 0) setDirection(RIGHT);
-                    break;
-                default:
-                    break;
-            }
-        };
-
+        const handleKeyDown = (e) => handleManualControl(e.key);
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [direction, isAI]);
+    }, [handleDirectionChange, isAI]);
 
     // Render Canvas
     useEffect(() => {
@@ -277,8 +292,8 @@ const SnakeGame = () => {
                     <button
                         onClick={() => setIsAI(!isAI)}
                         className={`px-4 py-2 font-bold rounded border transition-all duration-300 ${isAI
-                                ? 'bg-neonBlue/20 border-neonBlue text-neonBlue shadow-[0_0_15px_rgba(0,243,255,0.4)]'
-                                : 'bg-transparent border-gray-600 text-gray-400 hover:border-gray-400'
+                            ? 'bg-neonBlue/20 border-neonBlue text-neonBlue shadow-[0_0_15px_rgba(0,243,255,0.4)]'
+                            : 'bg-transparent border-gray-600 text-gray-400 hover:border-gray-400'
                             }`}
                     >
                         {isAI ? 'AI AUTOPILOT: ON' : 'ENABLE AI'}
@@ -297,8 +312,8 @@ const SnakeGame = () => {
                     width={CANVAS_WIDTH}
                     height={CANVAS_HEIGHT}
                     className={`border-2 rounded-sm shadow-2xl transition-all duration-500 ${gameOver
-                            ? 'border-neonRed shadow-[0_0_30px_rgba(255,7,58,0.5)]'
-                            : 'border-neonGreen shadow-[0_0_20px_rgba(57,255,20,0.3)]'
+                        ? 'border-neonRed shadow-[0_0_30px_rgba(255,7,58,0.5)]'
+                        : 'border-neonGreen shadow-[0_0_20px_rgba(57,255,20,0.3)]'
                         }`}
                 />
 
@@ -326,6 +341,9 @@ const SnakeGame = () => {
                 <span>[ARROWS] CONTROL</span>
                 <span>[AI] TOGGLE BOT</span>
             </div>
+
+            {/* Mobile Controls */}
+            {!isAI && <MobileControls onMove={handleManualControl} />}
         </div>
     );
 };
