@@ -2,8 +2,6 @@
 
 A Cyberpunk-themed Snake Game built with React and Vite. Features a toggleable AI Autopilot powered by Breadth-First Search (BFS).
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-
 ## 🎮 Features
 - **Cyberpunk Aesthetic**: Neon visuals, dark mode, and glowing effects.
 - **Dual Modes**:
